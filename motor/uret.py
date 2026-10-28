@@ -23,10 +23,10 @@ KOK = ses.KOK
 SR = ses.SR
 FPS = 30
 
-ILK_BOSLUK = 0.30     # videonun başında ilk kelimeden önce
-CUMLE_ARASI = 0.20
-SAHNE_SONU = 0.38
-SAHNE_GIRIS = 0.14    # kesmeden sonra görüntü sesten biraz önce gelir
+ILK_BOSLUK = 0.30     # videonun başında ilk kelimeden önce (döngülü videoda daha kısa)
+CUMLE_ARASI = 0.15
+SAHNE_SONU = 0.32
+SAHNE_GIRIS = 0.10    # kesmeden sonra görüntü sesten biraz önce gelir
 MIN_SURE = {"hook": 2.6, "madde": 3.5, "kapanis": 3.2}
 
 
@@ -62,13 +62,39 @@ def altyaziya_bol(kelimeler):
     return sonuc
 
 
+def gorsel_olaylari(g, t0):
+    """Bir görsel adımının ekrana gelişine eşlik eden efektler."""
+    parcalar = g.get("denklem") or g.get("emojiler")
+    if parcalar:
+        olaylar = [{"tur": "pop2", "t": t0 + 0.05 + j * 0.16} for j in range(len(parcalar))]
+    else:
+        olaylar = [{"tur": "pop", "t": t0 + 0.05}]
+    if g.get("sayac"):
+        olaylar.append({"tur": "sayac", "t": t0 + 0.15})
+    olaylar += [{"tur": "cubuk", "t": t0 + 0.2 + j * 0.25} for j in range(len(g.get("karsilastirma", [])))]
+    return olaylar
+
+
+def kapak_bilgisi(icerik):
+    k = dict(icerik.get("kapak", {}))
+    kanca = next((s for s in icerik["sahneler"] if s["tur"] == "hook"), {})
+    k.setdefault("ust", icerik.get("seri", ""))
+    k.setdefault("baslik", kanca.get("rozet") or kanca.get("baslik", ""))
+    if "emojiler" not in k:
+        k["emojiler"] = [g["emoji"] for s in icerik["sahneler"] if s["tur"] == "madde"
+                         for g in (s.get("gorseller") or [])[:1] if g.get("emoji")]
+    return k
+
+
 def zaman_cizelgesi(icerik, motor):
     """Seslendirir ve her sahnenin/kelimenin zamanını hesaplar."""
-    t = ILK_BOSLUK
+    # Döngülü videoda son kelimeden ilk kelimeye boşluk kısa tutulur; video başa sarınca cümle devam eder gibi olur.
+    dongu = bool(icerik.get("dongu"))
+    t = 0.12 if dongu else ILK_BOSLUK
     sahneler, ses_parcalari, olaylar, tum_kelimeler = [], [], [], []
     toplam_madde = sum(1 for s in icerik["sahneler"] if s["tur"] == "madde")
     madde_no = 0
-    for sahne in icerik["sahneler"]:
+    for n, sahne in enumerate(icerik["sahneler"]):
         if sahneler:
             bas = t
             t += SAHNE_GIRIS
@@ -85,29 +111,31 @@ def zaman_cizelgesi(icerik, motor):
             ses_parcalari.append((t, x))
             tum_kelimeler.extend(kelimeler)
             t += len(x) / SR + CUMLE_ARASI
-        t += SAHNE_SONU - CUMLE_ARASI
+        son_sahne = n == len(icerik["sahneler"]) - 1
+        t += (0.15 if dongu and son_sahne else SAHNE_SONU) - CUMLE_ARASI
         t = max(t, bas + MIN_SURE[sahne["tur"]])
         kayit = {k: v for k, v in sahne.items() if k not in ("anlatim",)}
         kayit.update({"bas": round(bas, 3), "sure": round(t - bas, 3)})
         if sahne["tur"] == "madde":
             kayit["no"], kayit["toplam"] = madde_no, toplam_madde
             madde_no += 1
+        if sahne["tur"] == "madde" or sahne.get("gorseller"):
             gorseller = sahne.get("gorseller") or [{"cumle": 0, "emoji": sahne.get("emoji", "✨")}]
             for g in gorseller:
                 ci = min(g.get("cumle", 0), len(cumle_baslari) - 1)
                 g["b"] = round(max(bas, cumle_baslari[ci] - 0.12) - bas, 3)
-                olaylar.append({"tur": "pop", "t": bas + g["b"] + 0.05})
+                olaylar += gorsel_olaylari(g, bas + g["b"])
             kayit["gorseller"] = gorseller
         if bas > 0:
             olaylar.append({"tur": "whoosh", "t": bas - 0.32})
         if sahne["tur"] == "kapanis":
-            olaylar.append({"tur": "zil", "t": bas + 0.15})
+            olaylar += [{"tur": "zil", "t": bas + 0.15}, {"tur": "pop2", "t": bas + 0.72}, {"tur": "pop2", "t": bas + 0.90}]
         sahneler.append(kayit)
     olaylar.append({"tur": "darbe", "t": 0.02})
-    sure = round(t + 0.25, 3)
+    sure = round(t + (0.05 if dongu else 0.25), 3)
     return {"fps": FPS, "sure": sure, "seri": icerik.get("seri", ""),
             "kullanici": icerik.get("kullanici", ""), "sahneler": sahneler,
-            "altyazi": altyaziya_bol(tum_kelimeler)}, ses_parcalari, olaylar
+            "altyazi": altyaziya_bol(tum_kelimeler), "kapak": kapak_bilgisi(icerik)}, ses_parcalari, olaylar
 
 
 def ses_miksi(cizelge, ses_parcalari, olaylar, icerik, klasor):
@@ -228,9 +256,7 @@ def main():
     os.remove(sessiz)
     os.remove(ses_yolu)
     print("5/5 Kapak ve paylaşım metinleri...")
-    kapak_t = cizelge["sahneler"][0]["bas"] + min(1.6, cizelge["sahneler"][0]["sure"] - 0.4)
-    render(cizelge_yolu, os.path.join(klasor, "kapak"), "--kareler", str(round(kapak_t, 2)))
-    os.replace(os.path.join(klasor, f"kapak-{round(kapak_t, 2)}.jpg"), os.path.join(klasor, "kapak.jpg"))
+    render(cizelge_yolu, os.path.join(klasor, "kapak.jpg"), "--kapak")
     paylasim_metinleri(icerik, klasor)
     print("Hazır:", video)
 

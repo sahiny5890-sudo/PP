@@ -1,21 +1,25 @@
 {
   "id": "001-saskin-gercekler",
   "seri": "BUNLARI BİLİYOR MUYDUN?",
-  "ses": { "motor": "piper", "konusmaci": "fahrettin", "hiz": 1.05 },
-  "muzik": { "ruh_hali": "merak", "bpm": 88 },
+  "dongu": true,
+  "ses": { "motor": "piper", "konusmaci": "fahrettin", "hiz": 1.12 },
+  "muzik": { "ruh_hali": "merak", "bpm": 92 },
   "sahneler": [
     {
       "tur": "hook",
-      "anlatim": "Bunları biliyor muydun? İşte seni şaşırtacak beş gerçek!",
-      "buyuk": "5",
-      "baslik": "şaşırtıcı gerçek",
-      "emojiler": ["🐙", "🍯", "🪐", "🦒", "☁️"],
-      "renk": ["#1f1033", "#db2777"]
+      "anlatim": "Bir bulut, yaklaşık yüz fil kadar ağır olabilir! İşte bunun gibi beş şaşırtıcı gerçek.",
+      "rozet": "5 ŞAŞIRTICI GERÇEK",
+      "baslik": "Bir bulut = *100* *fil*",
+      "gorseller": [
+        { "cumle": 0, "denklem": ["☁️", "=", "🐘", "×100"] },
+        { "cumle": 1, "emojiler": ["🐙", "🍯", "🪐", "🦒", "☁️"] }
+      ],
+      "renk": ["#082f49", "#db2777"]
     },
     {
       "tur": "madde",
       "baslik": "Ahtapotların 3 kalbi var",
-      "anlatim": "Ahtapotların tam üç kalbi var. İkisi solungaçlara, biri de vücudun geri kalanına kan pompalar. Üstelik kanları mavi!",
+      "anlatim": "Ahtapotların tam üç kalbi var. İkisi solungaçlara, biri tüm vücuda kan pompalar. Üstelik kanları mavi!",
       "gorseller": [{ "cumle": 0, "emoji": "🐙" }, { "cumle": 1, "emoji": "🫀" }, { "cumle": 2, "emoji": "💙" }],
       "renk": ["#2e1065", "#7c3aed"]
     },
@@ -29,7 +33,7 @@
     {
       "tur": "madde",
       "baslik": "Venüs'te bir gün, bir *yıldan* *uzun*",
-      "anlatim": "Venüs'te bir gün, bir yıldan uzun sürer. Gezegen kendi ekseni etrafında 243 günde döner, Güneş'in etrafında ise 225 günde.",
+      "anlatim": "Venüs'te bir gün, bir yıldan uzun. Gezegen kendi ekseni etrafında 243 günde döner, Güneş'in etrafında ise 225 günde.",
       "gorseller": [
         { "cumle": 0, "gezegen": { "renk": ["#fde68a", "#c2410c"] } },
         { "cumle": 1, "karsilastirma": [
@@ -42,25 +46,34 @@
     {
       "tur": "madde",
       "baslik": "Zürafanın boynunda da 7 omur var",
-      "anlatim": "Zürafanın upuzun boynunda, tıpkı seninki gibi, sadece yedi omur var. Farkı şu: tek bir omur {25 cm'yi|yirmi beş santimetreyi} geçebilir.",
+      "anlatim": "Zürafanın upuzun boynunda da, tıpkı seninki gibi, sadece yedi omur var. Ama tek bir omur {25 cm'yi|yirmi beş santimetreyi} geçebilir.",
       "gorseller": [{ "cumle": 0, "emoji": "🦒" }, { "cumle": 1, "sayac": { "ust": "tek bir omur", "deger": 25, "birim": "CM'DEN UZUN" } }],
       "renk": ["#3f2305", "#ca8a04"]
     },
     {
       "tur": "madde",
-      "baslik": "Bir bulut *yüzlerce* *ton* gelir",
-      "anlatim": "Kabarık bir bulut yaklaşık beş yüz ton ağırlığındadır. Peki neden düşmüyor? Çünkü bu su milyarlarca minicik damlacığa dağılmıştır ve yükselen hava onları taşır.",
-      "gorseller": [{ "cumle": 0, "emoji": "☁️" }, { "cumle": 1, "sayac": { "ust": "ortalama bir bulut", "deger": 500, "birim": "TON" } }],
+      "baslik": "Bir bulut 500 ton su taşır",
+      "anlatim": "Gelelim buluta: kabarık bir bulut yaklaşık beş yüz ton su taşır. Peki neden düşmüyor? Çünkü bu su milyarlarca minicik damlacığa dağılmıştır ve yükselen hava onları taşır.",
+      "gorseller": [
+        { "cumle": 0, "sayac": { "ust": "ortalama bir bulut", "deger": 500, "birim": "TON SU" } },
+        { "cumle": 1, "emoji": "☁️" },
+        { "cumle": 2, "emoji": "💨" }
+      ],
       "renk": ["#082f49", "#0284c7"]
     },
     {
       "tur": "kapanis",
-      "anlatim": "Sen bunlardan kaçını biliyordun? Yoruma yaz, yeni gerçekler için takip etmeyi unutma!",
+      "anlatim": "Sen bunlardan kaçını biliyordun? Yoruma yaz, takip et ve unutma:",
       "emoji": "🤔",
       "baslik": "*Kaçını* biliyordun?",
-      "renk": ["#111827", "#4f46e5"]
+      "renk": ["#082f49", "#db2777"]
     }
   ],
+  "kapak": {
+    "baslik": "5 *ŞAŞIRTICI* GERÇEK",
+    "alt": "Bir bulut = 100 fil? 🐘",
+    "emojiler": ["🐙", "🍯", "🪐", "🦒", "☁️"]
+  },
   "kaynaklar": [
     "NASA Science (Venüs)",
     "USGS Water Science School (bulut ağırlığı)",
@@ -69,9 +82,9 @@
     "Royal Society Open Science, 2015 (zürafa omurları)"
   ],
   "paylasim": {
-    "youtube_baslik": "Bunları Biliyor muydun? 🤯 5 Şaşırtıcı Gerçek #shorts",
-    "aciklama": "Bunlardan kaçını biliyordun? 🤯 Yoruma sayını yaz 👇\n\n🐙 Ahtapotların 3 kalbi var\n🍯 Bal neredeyse hiç bozulmaz\n🪐 Venüs'te bir gün, bir yıldan uzun\n🦒 Zürafanın boynunda da 7 omur var\n☁️ Bir bulut yüzlerce ton gelir\n\nHer gün yeni bilgiler için takip et 🔔",
-    "tiktok_aciklama": "Kaçını biliyordun? 🤯 Yoruma yaz 👇",
+    "youtube_baslik": "Bir Bulut 100 Fil Ağırlığında! 🤯 5 Şaşırtıcı Gerçek #shorts",
+    "aciklama": "Bunlardan kaçını biliyordun? 🤯 Yoruma sayını yaz 👇\n\n☁️ Bir bulut yaklaşık 100 fil ağırlığında\n🐙 Ahtapotların 3 kalbi var\n🍯 Bal neredeyse hiç bozulmaz\n🪐 Venüs'te bir gün, bir yıldan uzun\n🦒 Zürafanın boynunda da 7 omur var\n\nHer gün yeni bilgiler için takip et 🔔",
+    "tiktok_aciklama": "Bir bulut 100 fil ağırlığında 🤯 Kaçını biliyordun? Yoruma yaz 👇",
     "etiketler": ["#bilgi", "#ilginçbilgiler", "#bunlarıbiliyormuydun", "#bilim", "#doğa", "#uzay", "#hayvanlar", "#keşfet"]
   }
 }

@@ -36,6 +36,7 @@
     font-weight: 900; font-size: 98px; line-height: 1.06; letter-spacing: -1.5px;
     text-shadow: 0 10px 40px rgba(0,0,0,.35); }
   .baslik .w { display: inline-block; margin: 0 13px; }
+  .hook .baslik { font-size: 90px; }
   .hl { color: #fde047; }
 
   /* Kanca sahnesi */
@@ -83,6 +84,27 @@
     -webkit-text-stroke: 16px #000; paint-order: stroke fill; text-shadow: 0 10px 30px rgba(0,0,0,.5); }
   #altyazi span.aktif { color: #fde047; }
 
+  /* Denklem ve emoji sırası: parçalar tek tek belirir (☁️ = 🐘 ×100) */
+  .denklem { display: flex; align-items: center; justify-content: center; gap: 22px; }
+  .denklem span { display: inline-block; opacity: 0; }
+  .denklem .e { font-family: "Noto Color Emoji"; font-size: 170px; line-height: 1; filter: drop-shadow(0 24px 40px rgba(0,0,0,.45)); }
+  .denklem .m { font-weight: 900; font-size: 128px; color: #fde047; letter-spacing: -3px; text-shadow: 0 16px 50px rgba(253,224,71,.3); }
+  .denklem.sira { gap: 26px; }
+  .denklem.sira .e { font-size: 124px; }
+
+  /* Kapak: profil ızgarasında 3:4 kırpılınca da okunacak şekilde ortada */
+  #kapak { position: absolute; inset: 0; display: none; }
+  #kapak .k-ust { position: absolute; top: 330px; left: 70px; right: 70px; text-align: center;
+    font-weight: 800; font-size: 44px; letter-spacing: 8px; color: rgba(255,255,255,.85); }
+  #kapak .k-emoji { position: absolute; top: 450px; left: 70px; right: 70px; display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 0 34px; }
+  #kapak .k-emoji span { font-family: "Noto Color Emoji"; font-size: 175px; line-height: 1.18;
+    filter: drop-shadow(0 24px 40px rgba(0,0,0,.45)); }
+  #kapak .k-baslik { position: absolute; top: 980px; left: 70px; right: 70px; text-align: center; font-weight: 900;
+    font-size: 150px; line-height: 1; letter-spacing: -4px; text-shadow: 0 16px 50px rgba(0,0,0,.45); }
+  #kapak .k-alt { position: absolute; top: 1360px; left: 70px; right: 70px; text-align: center;
+    font-weight: 800; font-size: 62px; color: #fde047; }
+
   #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
 </style>
 </head>
@@ -97,6 +119,7 @@
 <div id="bars"></div>
 <div id="seri"></div>
 <div id="altyazi"></div>
+<div id="kapak"></div>
 <div id="flash"></div>
 
 <script>
@@ -137,6 +160,10 @@ function gorselHTML(g) {
         <div class="cubuk"><i data-w="${x.deger / max}"></i></div></div>`;
     }).join('')}</div>`;
   }
+  if (g.denklem || g.emojiler) {
+    const parca = x => `<span class="${/\p{Extended_Pictographic}/u.test(x) ? 'e' : 'm'}">${esc(x)}</span>`;
+    return `<div class="denklem${g.emojiler ? ' sira' : ''}">${(g.denklem || g.emojiler).map(parca).join('')}</div>`;
+  }
   return '';
 }
 
@@ -147,7 +174,12 @@ window.SETUP = (tl) => {
   for (const s of tl.sahneler) {
     const el = document.createElement('div');
     el.className = 'sahne ' + s.tur;
-    if (s.tur === 'hook') {
+    if (s.tur === 'hook' && s.gorseller) {
+      // Merak kancası: en çarpıcı bilgi görseliyle açılır, üstte rozet ("5 ŞAŞIRTICI GERÇEK").
+      el.innerHTML = `${s.rozet ? `<div class="chip">${esc(s.rozet)}</div>` : ''}
+        <div class="slot">${s.gorseller.map(g => `<div class="beat">${gorselHTML(g)}</div>`).join('')}</div>
+        <div class="baslik">${kelimeler(s.baslik)}</div>`;
+    } else if (s.tur === 'hook') {
       el.innerHTML = `<div class="hook-sayi">${esc(s.buyuk)}</div><div class="hook-baslik">${esc(s.baslik)}</div>
         <div class="emoji-sira">${(s.emojiler || []).map(e => `<span>${e}</span>`).join('')}</div>`;
     } else if (s.tur === 'madde') {
@@ -193,9 +225,11 @@ window.SETUP = (tl) => {
 function sahneyiCiz(s, t) {
   const u = t - s.bas, el = s.el;
   if (u < 0 || u > s.sure) { el.style.opacity = 0; return; }
-  const giris = easeOut(u / 0.28), cikis = easeInOut((u - (s.sure - 0.28)) / 0.28);
+  // İlk sahne karanlıktan açılmaz (döngüde son kareden ilk kareye pürüzsüz geçiş), küçük bir vuruşla başlar.
+  const ilk = s.bas === 0;
+  const giris = ilk ? 1 : easeOut(u / 0.28), cikis = easeInOut((u - (s.sure - 0.28)) / 0.28);
   el.style.opacity = Math.min(giris, 1 - cikis);
-  const itme = 1 + 0.035 * (u / s.sure);
+  const itme = (1 + 0.035 * (u / s.sure)) * (ilk ? 1 + 0.05 * (1 - easeOut(u / 0.35)) : 1);
   el.style.transform = `translateY(${(1 - giris) * 50 - cikis * 70}px) scale(${itme * (1 - cikis * 0.05)})`;
 
   // Görsel slotu: her "beat" sıradaki gelene kadar ekranda kalır.
@@ -205,8 +239,14 @@ function sahneyiCiz(s, t) {
     const sonraki = s.gorseller[k + 1] ? s.gorseller[k + 1].b : 1e9;
     const v = u - g.b;
     if (v < 0 || u > sonraki + 0.22) { be.style.opacity = 0; return; }
-    const gir = backOut(v / 0.5), cik = easeInOut((u - sonraki) / 0.22);
+    const tekTek = !!be.querySelector('.denklem');
+    const gir = tekTek ? 1 : backOut(v / 0.5), cik = easeInOut((u - sonraki) / 0.22);
     be.style.opacity = clamp(v / 0.12) * (1 - cik);
+    be.querySelectorAll('.denklem span').forEach((sp, j) => {
+      const p = backOut((v - 0.05 - j * 0.16) / 0.42);
+      sp.style.opacity = clamp((v - 0.05 - j * 0.16) / 0.08);
+      sp.style.transform = `scale(${Math.max(0, p)}) translateY(${Math.sin(u * 2.4 + j) * 6}px)`;
+    });
     // Emojiler canlı dursun diye hafifçe sallanır; grafik ve sayaçlar düz kalır.
     const emoji = !!be.querySelector('.emoji');
     const salinim = Math.sin(u * 2.1 + k) * (emoji ? 10 : 4);
@@ -301,6 +341,21 @@ window.FRAME = (t) => {
 
   const kesim = Math.min(...S.filter(s => s.bas > 0).map(s => Math.abs(t - s.bas)));
   document.getElementById('flash').style.opacity = clamp(0.24 - kesim * 1.5);
+};
+
+// Kapak görseli: videonun arka planı üstünde büyük başlık ve emoji kolajı.
+window.KAPAK = (k) => {
+  window.FRAME(k.t || 0.6);
+  ['stage', 'altyazi', 'bars', 'seri', 'flash'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  const el = document.getElementById('kapak');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="k-ust">${esc(k.ust || '')}</div>
+    <div class="k-emoji">${(k.emojiler || []).map(e => `<span>${e}</span>`).join('')}</div>
+    <div class="k-baslik">${kelimeler(k.baslik || '')}</div>
+    <div class="k-alt">${esc(k.alt || '')}</div>`;
+  const b = el.querySelector('.k-baslik');
+  let boy = 150;
+  while (b.scrollHeight > boy * 2 + 8 && boy > 60) { boy -= 6; b.style.fontSize = boy + 'px'; }
 };
 </script>
 </body>

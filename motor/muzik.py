@@ -171,7 +171,49 @@ def zil():
     return _reverb(np.stack([y, y], axis=1), sure=1.8, karisim=0.3).astype(np.float32)
 
 
-EFEKTLER = {"whoosh": (whoosh, 0.20), "pop": (pop, 0.16), "darbe": (darbe, 0.30), "zil": (zil, 0.10)}
+def pop_kucuk():
+    t = np.arange(int(0.09 * SR)) / SR
+    frekans = 800 + 1300 * np.exp(-t * 70)
+    y = np.sin(2 * np.pi * np.cumsum(frekans) / SR) * np.exp(-t * 45) * np.minimum(1, t / 0.002)
+    y /= np.abs(y).max()
+    return np.stack([y, y], axis=1).astype(np.float32)
+
+
+def _tik():
+    n = int(0.018 * SR)
+    t = np.arange(n) / SR
+    return (0.6 * np.sin(2 * np.pi * 2600 * t) + 0.4 * _filtre(np.random.randn(n), "highpass", 3000)) * np.exp(-t * 260)
+
+
+def sayac_sesi(sure=1.1, adim=14):
+    """Sayaç dönerken yavaşlayan tıkırtı + sonda zil. Zamanlama sahnedeki easeOut sayımıyla aynı."""
+    n = int((sure + 1.6) * SR)
+    y = np.zeros(n)
+    tik = _tik()
+    for k in range(1, adim + 1):
+        i = int(sure * (1 - (1 - k / adim) ** (1 / 3)) * SR)
+        y[i:i + len(tik)] += tik[: n - i] * (0.6 + 0.4 * k / adim)
+    son = zil()[:, 0] * 0.7
+    i = int((sure + 0.02) * SR)
+    m = min(len(son), n - i)
+    y[i:i + m] += son[:m]
+    y /= np.abs(y).max() + 1e-9
+    return np.stack([y, y], axis=1).astype(np.float32)
+
+
+def cubuk_sesi(sure=0.9):
+    """Çubuk dolarken yükselen ton."""
+    t = np.arange(int(sure * SR)) / SR
+    faz = 2 * np.pi * np.cumsum(260 + 700 * (t / sure) ** 1.5) / SR
+    zarf = np.sin(np.pi * np.minimum(1, t / sure)) ** 0.8 * np.minimum(1, t / 0.02)
+    y = (np.sin(faz) + 0.3 * np.sin(2 * faz)) * zarf
+    y += _filtre(np.random.randn(len(t)), "bandpass", [1500, 6000]) * zarf * 0.25
+    y /= np.abs(y).max() + 1e-9
+    return np.stack([y * 0.9, y], axis=1).astype(np.float32)
+
+
+EFEKTLER = {"whoosh": (whoosh, 0.20), "pop": (pop, 0.16), "pop2": (pop_kucuk, 0.11), "darbe": (darbe, 0.30),
+            "zil": (zil, 0.10), "sayac": (sayac_sesi, 0.11), "cubuk": (cubuk_sesi, 0.06)}
 
 
 def efekt_izi(olaylar, sure):

@@ -2,6 +2,7 @@
 // Kareler birkaç sekmeye bölünüp paralel çizilir; parçalar sonunda kayıpsız birleştirilir.
 // Kullanım: node render.js cizelge.json cikti.mp4 [--isci 3]
 //           node render.js cizelge.json onek --kareler 1.2 5.0 ...   (seçili anların JPG'leri)
+//           node render.js cizelge.json kapak.jpg --kapak             (kapak görseli)
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,6 +44,14 @@ async function parcaCiz(browser, tl, bas, son, cikti, ilerleme) {
   const [cizelgeYolu, cikti, mod, ...zamanlar] = process.argv.slice(2);
   const tl = JSON.parse(fs.readFileSync(cizelgeYolu, 'utf8'));
   const browser = await chromium.launch();
+
+  if (mod === '--kapak') {
+    const page = await sayfaAc(browser, tl);
+    await page.evaluate(k => window.KAPAK(k), tl.kapak || {});
+    await page.screenshot({ path: cikti, type: 'jpeg', quality: 93 });
+    await browser.close();
+    return;
+  }
 
   if (mod === '--kareler') {
     const page = await sayfaAc(browser, tl);

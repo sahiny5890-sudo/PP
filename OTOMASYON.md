@@ -18,8 +18,14 @@ cd PP && git pull && ./kurulum.sh
 
 ## 3. İçerik dosyası
 `icerikler/NNN-kisa-ad.json` dosyasını `001-saskin-gercekler.json` biçiminde yaz:
-- 1 kanca (`hook`) + 4-5 madde + 1 kapanış. Toplam anlatım 35-55 sn.
-- Kanca ilk 2 saniyede merak uyandırmalı; her maddenin ilk cümlesi başlığı söylesin.
+- 1 kanca (`hook`) + 4-5 madde + 1 kapanış. Toplam 35-45 sn, `"hiz": 1.12`.
+- **Kanca**: ilk cümle listedeki en çarpıcı bilgiyi söyler ("Bir bulut yaklaşık yüz fil kadar ağır
+  olabilir!"), karşılığı videonun sonunda verilir; izleyici sonuna kadar kalır. Kanca görseli olarak
+  `denklem` (["☁️", "=", "🐘", "×100"]) ve `emojiler` kullan, üstte `rozet` ("5 ŞAŞIRTICI GERÇEK").
+- **Döngü**: `"dongu": true`. Kapanışın son cümlesi kancanın ilk cümlesine bağlansın
+  ("... ve unutma:" → "Bir bulut, yüz fil kadar ağır olabilir!"). Kapanış rengi = kanca rengi.
+- Her maddenin ilk cümlesi başlığı söylesin; dolgu kelimeleri at, cümleler kısa olsun.
+- `kapak` alanını doldur: `baslik` (ör. "5 *ŞAŞIRTICI* GERÇEK"), `alt` (kancadaki merak sorusu), `emojiler`.
 - Her maddeye görsel ritim ekle: cümle başına bir `gorseller` adımı (emoji, `sayac`,
   `karsilastirma`, `gezegen`). Sayısal bilgilerde sayaç/karşılaştırma kullan.
 - Ekranda farklı, okunuşta farklı ifadeler için `{25 cm|yirmi beş santimetre}` kullan.
@@ -36,7 +42,8 @@ Kareleri incele: taşan/çakışan yazı, okunmayan altyazı, yanlış emoji var
 ```bash
 python3 motor/uret.py icerikler/NNN-kisa-ad.json
 ```
-Kontrol: süre 30-59 sn, `ffprobe` ile 1080x1920 / 30 fps / AAC.
+Kontrol: süre 30-59 sn, `ffprobe` ile 1080x1920 / 30 fps / AAC, ses -14 LUFS civarı.
+`kapak.jpg` dosyasına da bak: başlık okunuyor mu, emojiler doğru mu.
 
 ## 5. Yayın
 - İlk yayında `python3 yayin/yayinla.py --kontrol` çıktısındaki kuralları oku; TikTok şemasında
