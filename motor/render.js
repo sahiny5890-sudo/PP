@@ -18,8 +18,8 @@ async function sayfaAc(browser, tl) {
 
 function kodlayici(cikti, fps) {
   return spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps),
-    '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
-    '-maxrate', '14M', '-bufsize', '28M', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
+    '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19',
+    '-maxrate', '10M', '-bufsize', '20M', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
     '-g', String(fps * 2), cikti], { stdio: ['pipe', 'inherit', 'inherit'] });
 }
 
