@@ -1,0 +1,77 @@
+{
+  "id": "001-saskin-gercekler",
+  "seri": "BUNLARI BİLİYOR MUYDUN?",
+  "ses": { "motor": "piper", "konusmaci": "fahrettin", "hiz": 1.05 },
+  "muzik": { "ruh_hali": "merak", "bpm": 88 },
+  "sahneler": [
+    {
+      "tur": "hook",
+      "anlatim": "Bunları biliyor muydun? İşte seni şaşırtacak beş gerçek!",
+      "buyuk": "5",
+      "baslik": "şaşırtıcı gerçek",
+      "emojiler": ["🐙", "🍯", "🪐", "🦒", "☁️"],
+      "renk": ["#1f1033", "#db2777"]
+    },
+    {
+      "tur": "madde",
+      "baslik": "Ahtapotların 3 kalbi var",
+      "anlatim": "Ahtapotların tam üç kalbi var. İkisi solungaçlara, biri de vücudun geri kalanına kan pompalar. Üstelik kanları mavi!",
+      "gorseller": [{ "cumle": 0, "emoji": "🐙" }, { "cumle": 1, "emoji": "🫀" }, { "cumle": 2, "emoji": "💙" }],
+      "renk": ["#2e1065", "#7c3aed"]
+    },
+    {
+      "tur": "madde",
+      "baslik": "Bal neredeyse *hiç* *bozulmaz*",
+      "anlatim": "Bal neredeyse hiç bozulmaz. Arkeologlar Mısır mezarlarında, binlerce yıllık ve hâlâ yenebilir bal buldu.",
+      "gorseller": [{ "cumle": 0, "emoji": "🍯" }, { "cumle": 1, "emoji": "🏺" }],
+      "renk": ["#431407", "#d97706"]
+    },
+    {
+      "tur": "madde",
+      "baslik": "Venüs'te bir gün, bir *yıldan* *uzun*",
+      "anlatim": "Venüs'te bir gün, bir yıldan uzun sürer. Gezegen kendi ekseni etrafında 243 günde döner, Güneş'in etrafında ise 225 günde.",
+      "gorseller": [
+        { "cumle": 0, "gezegen": { "renk": ["#fde68a", "#c2410c"] } },
+        { "cumle": 1, "karsilastirma": [
+          { "etiket": "Kendi ekseninde 1 tur", "deger": 243, "yazi": "243 gün" },
+          { "etiket": "Güneş etrafında 1 tur", "deger": 225, "yazi": "225 gün" }
+        ] }
+      ],
+      "renk": ["#1c0a00", "#ea580c"]
+    },
+    {
+      "tur": "madde",
+      "baslik": "Zürafanın boynunda da 7 omur var",
+      "anlatim": "Zürafanın upuzun boynunda, tıpkı seninki gibi, sadece yedi omur var. Farkı şu: tek bir omur {25 cm'yi|yirmi beş santimetreyi} geçebilir.",
+      "gorseller": [{ "cumle": 0, "emoji": "🦒" }, { "cumle": 1, "sayac": { "ust": "tek bir omur", "deger": 25, "birim": "CM'DEN UZUN" } }],
+      "renk": ["#3f2305", "#ca8a04"]
+    },
+    {
+      "tur": "madde",
+      "baslik": "Bir bulut *yüzlerce* *ton* gelir",
+      "anlatim": "Kabarık bir bulut yaklaşık beş yüz ton ağırlığındadır. Peki neden düşmüyor? Çünkü bu su milyarlarca minicik damlacığa dağılmıştır ve yükselen hava onları taşır.",
+      "gorseller": [{ "cumle": 0, "emoji": "☁️" }, { "cumle": 1, "sayac": { "ust": "ortalama bir bulut", "deger": 500, "birim": "TON" } }, { "cumle": 2, "emoji": "💨" }],
+      "renk": ["#082f49", "#0284c7"]
+    },
+    {
+      "tur": "kapanis",
+      "anlatim": "Sen bunlardan kaçını biliyordun? Yoruma yaz, yeni gerçekler için takip etmeyi unutma!",
+      "emoji": "🤔",
+      "baslik": "*Kaçını* biliyordun?",
+      "renk": ["#111827", "#4f46e5"]
+    }
+  ],
+  "kaynaklar": [
+    "NASA Science (Venüs)",
+    "USGS Water Science School (bulut ağırlığı)",
+    "Smithsonian Magazine (balın raf ömrü)",
+    "Smithsonian Ocean (ahtapot)",
+    "Royal Society Open Science, 2015 (zürafa omurları)"
+  ],
+  "paylasim": {
+    "youtube_baslik": "Bunları Biliyor muydun? 🤯 5 Şaşırtıcı Gerçek #shorts",
+    "aciklama": "Bunlardan kaçını biliyordun? 🤯 Yoruma sayını yaz 👇\n\n🐙 Ahtapotların 3 kalbi var\n🍯 Bal neredeyse hiç bozulmaz\n🪐 Venüs'te bir gün, bir yıldan uzun\n🦒 Zürafanın boynunda da 7 omur var\n☁️ Bir bulut yüzlerce ton gelir\n\nHer gün yeni bilgiler için takip et 🔔",
+    "tiktok_aciklama": "Kaçını biliyordun? 🤯 Yoruma yaz 👇",
+    "etiketler": ["#bilgi", "#ilginçbilgiler", "#bunlarıbiliyormuydun", "#bilim", "#doğa", "#uzay", "#hayvanlar", "#keşfet"]
+  }
+}

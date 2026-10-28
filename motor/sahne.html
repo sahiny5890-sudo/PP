@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #05050a; }
+  body { font-family: "Inter Display", "Inter", "Noto Color Emoji", sans-serif; color: #fff; }
+
+  /* Arka plan katmanları */
+  #bg { position: absolute; inset: 0; }
+  .blob { position: absolute; width: 1500px; height: 1500px; opacity: .6; will-change: transform; }
+  .bokeh { position: absolute; border-radius: 50%; will-change: transform, opacity;
+    background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,255,255,.5) 35%, rgba(255,255,255,0) 70%); }
+  #grain { position: absolute; inset: -10px; opacity: .06; will-change: transform;
+    background-image: repeating-radial-gradient(circle at 17% 32%, #fff 0 1px, transparent 1px 3px); }
+  #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,.6) 100%); }
+
+  /* Üst bilgi: platform arayüzünün altında kalır */
+  #bars { position: absolute; top: 188px; left: 80px; right: 140px; display: flex; gap: 12px; }
+  .bar { flex: 1; height: 9px; border-radius: 5px; background: rgba(255,255,255,.22); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: #fff; border-radius: 5px; }
+  #seri { position: absolute; top: 222px; left: 80px; right: 140px; text-align: center;
+    font-weight: 800; font-size: 36px; letter-spacing: 7px; color: rgba(255,255,255,.82); }
+
+  /* Sahneler: içerik x=80..940 arasında (sağdaki platform butonlarından uzak) */
+  .sahne { position: absolute; left: 80px; width: 860px; top: 0; height: 1920px; opacity: 0; transform-origin: 50% 40%; }
+  .chip { position: absolute; top: 318px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+    font-weight: 800; font-size: 42px; padding: 12px 34px; border-radius: 60px;
+    background: rgba(255,255,255,.14); border: 2px solid rgba(255,255,255,.35); }
+  .slot { position: absolute; top: 410px; left: 0; right: 0; height: 330px; }
+  .beat { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; }
+  .emoji { font-family: "Noto Color Emoji"; font-size: 250px; line-height: 1;
+    filter: drop-shadow(0 30px 50px rgba(0,0,0,.45)); }
+  .baslik { position: absolute; top: 775px; left: 0; right: 0; text-align: center;
+    font-weight: 900; font-size: 98px; line-height: 1.06; letter-spacing: -1.5px;
+    text-shadow: 0 10px 40px rgba(0,0,0,.35); }
+  .baslik .w { display: inline-block; margin: 0 13px; }
+  .hl { color: #fde047; }
+
+  /* Kanca sahnesi */
+  .hook-sayi { position: absolute; top: 300px; left: 0; right: 0; text-align: center; font-weight: 900;
+    font-size: 440px; line-height: 1; color: #fde047; letter-spacing: -12px; text-shadow: 0 24px 90px rgba(253,224,71,.4); }
+  .hook-baslik { position: absolute; top: 760px; left: 0; right: 0; text-align: center; font-weight: 900;
+    font-size: 124px; line-height: 1; letter-spacing: -3px; }
+  .emoji-sira { position: absolute; top: 960px; left: 0; right: 0; display: flex; justify-content: center; gap: 26px; }
+  .emoji-sira span { font-family: "Noto Color Emoji"; font-size: 112px; display: inline-block; opacity: 0; }
+
+  /* Kapanış */
+  .ctas { position: absolute; top: 1010px; left: 0; right: 0; display: flex; justify-content: center; gap: 28px; }
+  .ctas span { font-weight: 800; font-size: 46px; padding: 18px 36px; border-radius: 70px; opacity: 0;
+    background: #fff; color: #111; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+  .ctas span + span { background: #fde047; }
+
+  /* Gezegen */
+  .gezegen { width: 300px; height: 300px; border-radius: 50%; position: relative; overflow: hidden;
+    background: radial-gradient(circle at 34% 30%, var(--a) 0%, var(--b) 58%, #1c0a00 100%);
+    box-shadow: 0 0 90px 18px color-mix(in srgb, var(--a) 45%, transparent), inset -40px -30px 70px rgba(0,0,0,.55); }
+  .gezegen i { position: absolute; inset: -40% -100%; opacity: .32; mix-blend-mode: overlay;
+    background: repeating-linear-gradient(8deg, transparent 0 22px, rgba(255,255,255,.7) 22px 34px, transparent 34px 60px); }
+
+  /* Sayaç */
+  .sayac { text-align: center; }
+  .sayac .ust { font-weight: 700; font-size: 44px; color: rgba(255,255,255,.8); letter-spacing: 1px; }
+  .sayac .deger { font-weight: 900; font-size: 230px; line-height: .95; color: #fde047; letter-spacing: -6px;
+    text-shadow: 0 20px 70px rgba(253,224,71,.35); font-variant-numeric: tabular-nums; }
+  .sayac .birim { font-weight: 900; font-size: 64px; letter-spacing: 6px; }
+
+  /* Karşılaştırma çubukları */
+  .kars { width: 860px; display: flex; flex-direction: column; gap: 34px; }
+  .kars .etiket { font-weight: 700; font-size: 40px; margin-bottom: 12px; color: rgba(255,255,255,.88); }
+  .kars .cubuk { height: 78px; border-radius: 16px; background: rgba(255,255,255,.12); position: relative; overflow: hidden; }
+  .kars .cubuk i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 16px; background: #fde047; }
+  .kars .satir + .satir .cubuk i { background: #fff; }
+  .kars .cubuk b { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font-weight: 900;
+    font-size: 46px; color: #111; mix-blend-mode: normal; }
+
+  /* Altyazı */
+  #altyazi { position: absolute; top: 1165px; left: 80px; width: 860px; height: 250px; gap: 0 34px;
+    display: flex; flex-wrap: wrap; align-content: center; justify-content: center; text-align: center; }
+  #altyazi span { display: inline-block; font-weight: 900; font-size: 84px; line-height: 1.12;
+    -webkit-text-stroke: 16px #000; paint-order: stroke fill; text-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  #altyazi span.aktif { color: #fde047; }
+
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="bg">
+  <div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div>
+  <div id="bokeh"></div>
+</div>
+<div id="grain"></div>
+<div id="vignette"></div>
+<div id="stage"></div>
+<div id="bars"></div>
+<div id="seri"></div>
+<div id="altyazi"></div>
+<div id="flash"></div>
+
+<script>
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeInOut = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const backOut = x => { x = clamp(x); const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const rgb = c => `rgb(${c.join(',')})`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const VARSAYILAN_RENK = { hook: ['#111827', '#db2777'], madde: ['#1e1b4b', '#6366f1'], kapanis: ['#111827', '#4f46e5'] };
+
+let TL, S = [], bokeh = [], sonRenk = '';
+
+// Sayıları, ardındaki kelimeyi ve *yıldızlı* kelimeleri sarı yapar ("3 kalbi", "*hiç*").
+function kelimeler(metin) {
+  const p = metin.split(/\s+/);
+  return p.map((w, i) => {
+    const yildiz = /^\*.*\*[,.!?]*$/.test(w);
+    const vurgu = yildiz || /\d/.test(w) || (i > 0 && /\d/.test(p[i - 1]) && !/\d/.test(w));
+    return `<span class="w${vurgu ? ' hl' : ''}">${esc(w.replace(/\*/g, ''))}</span>`;
+  }).join(' ');
+}
+
+function gorselHTML(g) {
+  if (g.emoji) return `<div class="emoji">${g.emoji}</div>`;
+  if (g.gezegen) return `<div class="gezegen" style="--a:${g.gezegen.renk[0]};--b:${g.gezegen.renk[1]}"><i></i></div>`;
+  if (g.sayac) return `<div class="sayac"><div class="ust">${esc(g.sayac.ust || '')}</div>
+      <div class="deger" data-v="${g.sayac.deger}">0</div><div class="birim">${esc(g.sayac.birim || '')}</div></div>`;
+  if (g.karsilastirma) {
+    const k = g.karsilastirma, max = Math.max(...k.map(x => x.deger));
+    return `<div class="kars">${k.map(x => `<div class="satir"><div class="etiket">${esc(x.etiket)}</div>
+      <div class="cubuk"><i data-w="${x.deger / max}"></i><b>${esc(x.yazi || x.deger)}</b></div></div>`).join('')}</div>`;
+  }
+  return '';
+}
+
+window.SETUP = (tl) => {
+  TL = tl;
+  document.getElementById('seri').textContent = tl.seri || '';
+  const stage = document.getElementById('stage');
+  for (const s of tl.sahneler) {
+    const el = document.createElement('div');
+    el.className = 'sahne ' + s.tur;
+    if (s.tur === 'hook') {
+      el.innerHTML = `<div class="hook-sayi">${esc(s.buyuk)}</div><div class="hook-baslik">${esc(s.baslik)}</div>
+        <div class="emoji-sira">${(s.emojiler || []).map(e => `<span>${e}</span>`).join('')}</div>`;
+    } else if (s.tur === 'madde') {
+      el.innerHTML = `<div class="chip">${s.no + 1} / ${s.toplam}</div>
+        <div class="slot">${s.gorseller.map(g => `<div class="beat">${gorselHTML(g)}</div>`).join('')}</div>
+        <div class="baslik">${kelimeler(s.baslik)}</div>`;
+    } else {
+      el.innerHTML = `<div class="slot"><div class="beat"><div class="emoji">${s.emoji || '🤔'}</div></div></div>
+        <div class="baslik">${kelimeler(s.baslik)}</div>
+        <div class="ctas">${(s.butonlar || ['💬 Yoruma yaz', '🔔 Takip et']).map(b => `<span>${esc(b)}</span>`).join('')}</div>`;
+      s.gorseller = [{ b: 0 }];
+    }
+    stage.appendChild(el);
+    S.push({ ...s, el, renk: s.renk || VARSAYILAN_RENK[s.tur] });
+  }
+  const maddeler = S.filter(s => s.tur === 'madde');
+  document.getElementById('bars').innerHTML = maddeler.map(() => '<div class="bar"><i></i></div>').join('');
+
+  // Uzun yazıları alana sığdır: kanca başlığı tek satır, madde başlıkları en fazla 3 satır.
+  const sigdir = (el, sigiyor) => {
+    let boy = parseFloat(getComputedStyle(el).fontSize);
+    while (!sigiyor(el) && boy > 40) { boy -= 4; el.style.fontSize = boy + 'px'; }
+  };
+  S.forEach(s => {
+    s.el.style.opacity = 1;
+    s.el.querySelectorAll('.hook-baslik').forEach(el => { el.style.whiteSpace = 'nowrap'; sigdir(el, e => e.scrollWidth <= 860); });
+    s.el.querySelectorAll('.baslik').forEach(el => sigdir(el, e => e.scrollHeight <= parseFloat(getComputedStyle(e).fontSize) * 1.06 * 3 + 4));
+    s.el.style.opacity = 0;
+  });
+
+  // Bokeh noktaları: sabit tohumlu sözde rastgele, her render aynı.
+  let r = 12345; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  const kap = document.getElementById('bokeh');
+  for (let i = 0; i < 18; i++) {
+    const d = document.createElement('div'); d.className = 'bokeh';
+    const boy = 16 + rnd() * 50;
+    d.style.width = d.style.height = boy + 'px';
+    kap.appendChild(d);
+    bokeh.push({ el: d, x: rnd() * 1080, y: rnd() * 1920, hiz: 18 + rnd() * 50, faz: rnd() * 6.28, op: .08 + rnd() * .22 });
+  }
+};
+
+function sahneyiCiz(s, t) {
+  const u = t - s.bas, el = s.el;
+  if (u < 0 || u > s.sure) { el.style.opacity = 0; return; }
+  const giris = easeOut(u / 0.28), cikis = easeInOut((u - (s.sure - 0.28)) / 0.28);
+  el.style.opacity = Math.min(giris, 1 - cikis);
+  const itme = 1 + 0.035 * (u / s.sure);
+  el.style.transform = `translateY(${(1 - giris) * 50 - cikis * 70}px) scale(${itme * (1 - cikis * 0.05)})`;
+
+  // Görsel slotu: her "beat" sıradaki gelene kadar ekranda kalır.
+  const beats = el.querySelectorAll('.beat');
+  (s.gorseller || []).forEach((g, k) => {
+    const be = beats[k]; if (!be) return;
+    const sonraki = s.gorseller[k + 1] ? s.gorseller[k + 1].b : 1e9;
+    const v = u - g.b;
+    if (v < 0 || u > sonraki + 0.22) { be.style.opacity = 0; return; }
+    const gir = backOut(v / 0.5), cik = easeInOut((u - sonraki) / 0.22);
+    be.style.opacity = clamp(v / 0.12) * (1 - cik);
+    const salinim = Math.sin(u * 2.1 + k) * 10;
+    be.style.transform = `translateY(${salinim - cik * 40}px) scale(${Math.max(0, gir) * (1 - cik * 0.3)}) rotate(${(1 - clamp(gir)) * -18 + Math.sin(u * 1.7) * 2.5}deg)`;
+    const deger = be.querySelector('.deger');
+    if (deger) deger.textContent = Math.round(+deger.dataset.v * easeOut((v - 0.15) / 1.1)).toLocaleString('tr-TR');
+    be.querySelectorAll('.cubuk i').forEach((bar, j) => { bar.style.width = (+bar.dataset.w * easeOut((v - 0.2 - j * 0.25) / 0.9) * 100) + '%'; });
+    const gz = be.querySelector('.gezegen i');
+    if (gz) gz.style.transform = `translateX(${(u * 40) % 120}px)`;
+  });
+
+  el.querySelectorAll('.baslik .w').forEach((w, k) => {
+    const p = easeOut((u - 0.25 - k * 0.075) / 0.32);
+    w.style.opacity = p; w.style.transform = `translateY(${(1 - p) * 46}px)`;
+  });
+  const sayi = el.querySelector('.hook-sayi');
+  if (sayi) sayi.style.transform = `scale(${backOut((u - 0.02) / 0.55) * (1 + Math.sin(u * 3) * 0.015)})`;
+  const hb = el.querySelector('.hook-baslik');
+  if (hb) { const p = easeOut((u - 0.3) / 0.35); hb.style.opacity = p; hb.style.transform = `translateY(${(1 - p) * 40}px)`; }
+  el.querySelectorAll('.emoji-sira span').forEach((e, k) => {
+    const p = backOut((u - 0.6 - k * 0.11) / 0.45);
+    e.style.opacity = clamp((u - 0.6 - k * 0.11) / 0.1);
+    e.style.transform = `scale(${Math.max(0, p)}) translateY(${Math.sin(u * 2.4 + k) * 8}px)`;
+  });
+  el.querySelectorAll('.ctas span').forEach((c, k) => {
+    const p = backOut((u - 0.7 - k * 0.18) / 0.45);
+    c.style.opacity = clamp((u - 0.7 - k * 0.18) / 0.1);
+    c.style.transform = `scale(${Math.max(0, p) * (1 + 0.03 * Math.sin(u * 5 + k))})`;
+  });
+}
+
+let sonGrup = null;
+function altyaziyiCiz(t) {
+  const kutu = document.getElementById('altyazi');
+  const g = TL.altyazi.find(g => t >= g.b && t < g.s);
+  if (g !== sonGrup) {
+    kutu.innerHTML = g ? g.k.map(k => `<span>${esc(k.g)}</span>`).join('') : '';
+    sonGrup = g;
+  }
+  if (!g) return;
+  const p = backOut((t - g.b) / 0.16);
+  kutu.style.transform = `scale(${0.86 + 0.14 * p})`;
+  const spans = kutu.children;
+  let aktif = -1;
+  g.k.forEach((k, i) => { if (t >= k.b - 0.02) aktif = i; });
+  for (let i = 0; i < spans.length; i++) {
+    spans[i].classList.toggle('aktif', i === aktif);
+    spans[i].style.transform = i === aktif ? 'scale(1.05)' : 'scale(1)';
+  }
+}
+
+window.FRAME = (t) => {
+  let i = S.findIndex(s => t >= s.bas && t < s.bas + s.sure);
+  if (i < 0) i = S.length - 1;
+  const cur = S[i], nxt = S[Math.min(i + 1, S.length - 1)];
+  const harman = easeInOut((t - (cur.bas + cur.sure - 0.45)) / 0.45);
+  const c0 = mix(hex(cur.renk[0]), hex(nxt.renk[0]), harman);
+  const c1 = mix(hex(cur.renk[1]), hex(nxt.renk[1]), harman);
+  // Renkler yalnızca değiştiğinde yeniden boyanır; hareket sadece transform ile yapılır.
+  const renkAnahtari = c0.join() + c1.join();
+  if (renkAnahtari !== sonRenk) {
+    sonRenk = renkAnahtari;
+    document.getElementById('bg').style.background = `linear-gradient(165deg, ${rgb(c0)} 0%, #05050a 100%)`;
+    [['b1', c1], ['b2', c0], ['b3', c1]].forEach(([id, c]) => {
+      document.getElementById(id).style.background =
+        `radial-gradient(circle, rgba(${c.join(',')},.95) 0%, rgba(${c.join(',')},.45) 30%, rgba(${c.join(',')},0) 68%)`;
+    });
+  }
+  [['b1', 0.21, 0], ['b2', 0.17, 2], ['b3', 0.13, 4]].forEach(([id, hz, faz]) => {
+    document.getElementById(id).style.transform =
+      `translate(${540 + Math.cos(t * hz + faz) * 420 - 750}px, ${960 + Math.sin(t * hz * 1.3 + faz) * 700 - 750}px)`;
+  });
+  for (const b of bokeh) {
+    const y = ((b.y - t * b.hiz) % 1920 + 1920) % 1920;
+    b.el.style.transform = `translate(${b.x + Math.sin(t * 0.6 + b.faz) * 30}px, ${y}px)`;
+    b.el.style.opacity = b.op * (0.6 + 0.4 * Math.sin(t * 1.3 + b.faz));
+  }
+  document.getElementById('grain').style.transform = `translate(${(t * 977) % 7}px, ${(t * 613) % 5}px)`;
+
+  const bars = document.querySelectorAll('.bar i');
+  S.filter(s => s.tur === 'madde').forEach((s, k) => { bars[k].style.width = (clamp((t - s.bas) / s.sure) * 100) + '%'; });
+  document.getElementById('bars').style.opacity = cur.tur === 'madde' ? 1 : 0.4;
+
+  S.forEach(s => sahneyiCiz(s, t));
+  altyaziyiCiz(t);
+
+  const kesim = Math.min(...S.filter(s => s.bas > 0).map(s => Math.abs(t - s.bas)));
+  document.getElementById('flash').style.opacity = clamp(0.24 - kesim * 1.5);
+};
+</script>
+</body>
+</html>

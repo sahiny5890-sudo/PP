@@ -1,0 +1,11 @@
+{
+  "youtube": { "type": "public" },
+  "instagram": { "post_type": "post" },
+  "tiktok": {
+    "privacy_level": "PUBLIC_TO_EVERYONE",
+    "duet": true,
+    "stitch": true,
+    "comment": true,
+    "content_posting_method": "DIRECT_POST"
+  }
+}

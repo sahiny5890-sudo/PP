@@ -1,0 +1,5 @@
+.modeller/
+.onbellek/
+cikti/
+node_modules/
+__pycache__/
