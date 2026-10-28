@@ -39,6 +39,9 @@ python3 motor/uret.py icerikler/NNN-kisa-ad.json
 Kontrol: süre 30-59 sn, `ffprobe` ile 1080x1920 / 30 fps / AAC.
 
 ## 5. Yayın
+- İlk yayında `python3 yayin/yayinla.py --kontrol` çıktısındaki kuralları oku; TikTok şemasında
+  yapay zekâ etiketi alanı varsa (ör. `is_aigc`) `yayin/ayarlar.json` içinde `true` yap
+  (seslendirme sentetik olduğu için).
 - `POSTIZ_API_KEY` tanımlıysa:
   `python3 yayin/yayinla.py cikti/NNN-kisa-ad --saat 19:00` (onay modu açıksa `--taslak` ekle).
 - Tanımlı değilse: videoyu ve `paylasim.md` metnini kullanıcıya gönder; kullanıcı elle paylaşır.
