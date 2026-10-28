@@ -50,7 +50,7 @@
       "tur": "madde",
       "baslik": "Bir bulut *yüzlerce* *ton* gelir",
       "anlatim": "Kabarık bir bulut yaklaşık beş yüz ton ağırlığındadır. Peki neden düşmüyor? Çünkü bu su milyarlarca minicik damlacığa dağılmıştır ve yükselen hava onları taşır.",
-      "gorseller": [{ "cumle": 0, "emoji": "☁️" }, { "cumle": 1, "sayac": { "ust": "ortalama bir bulut", "deger": 500, "birim": "TON" } }, { "cumle": 2, "emoji": "💨" }],
+      "gorseller": [{ "cumle": 0, "emoji": "☁️" }, { "cumle": 1, "sayac": { "ust": "ortalama bir bulut", "deger": 500, "birim": "TON" } }],
       "renk": ["#082f49", "#0284c7"]
     },
     {

@@ -41,9 +41,11 @@ def altyaziya_bol(kelimeler):
     """Kelimeleri ekranda birlikte görünecek 1-3 kelimelik gruplara ayırır."""
     gruplar, grup = [], []
     for k in kelimeler:
+        if grup and len(" ".join(x["g"] for x in grup + [k])) > 18:
+            gruplar.append(grup)
+            grup = []
         grup.append(k)
-        metin = " ".join(x["g"] for x in grup)
-        if k["durak"] > 0 or len(grup) >= 3 or len(metin) >= 15:
+        if k["durak"] > 0 or len(grup) >= 3:
             gruplar.append(grup)
             grup = []
     if grup:

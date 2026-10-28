@@ -61,19 +61,20 @@
 
   /* Sayaç */
   .sayac { text-align: center; }
-  .sayac .ust { font-weight: 700; font-size: 44px; color: rgba(255,255,255,.8); letter-spacing: 1px; }
-  .sayac .deger { font-weight: 900; font-size: 230px; line-height: .95; color: #fde047; letter-spacing: -6px;
+  .sayac .ust { font-weight: 700; font-size: 40px; color: rgba(255,255,255,.8); letter-spacing: 1px; }
+  .sayac .deger { font-weight: 900; font-size: 190px; line-height: .95; color: #fde047; letter-spacing: -5px;
     text-shadow: 0 20px 70px rgba(253,224,71,.35); font-variant-numeric: tabular-nums; }
-  .sayac .birim { font-weight: 900; font-size: 64px; letter-spacing: 6px; }
+  .sayac .birim { font-weight: 900; font-size: 52px; letter-spacing: 5px; }
 
   /* Karşılaştırma çubukları */
   .kars { width: 860px; display: flex; flex-direction: column; gap: 34px; }
-  .kars .etiket { font-weight: 700; font-size: 40px; margin-bottom: 12px; color: rgba(255,255,255,.88); }
-  .kars .cubuk { height: 78px; border-radius: 16px; background: rgba(255,255,255,.12); position: relative; overflow: hidden; }
+  .kars .etiket { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;
+    font-weight: 700; font-size: 40px; color: rgba(255,255,255,.88); }
+  .kars .etiket b { font-weight: 900; font-size: 54px; color: #fde047; font-variant-numeric: tabular-nums; }
+  .kars .satir + .satir .etiket b { color: #fff; }
+  .kars .cubuk { height: 64px; border-radius: 16px; background: rgba(255,255,255,.12); position: relative; overflow: hidden; }
   .kars .cubuk i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 16px; background: #fde047; }
   .kars .satir + .satir .cubuk i { background: #fff; }
-  .kars .cubuk b { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font-weight: 900;
-    font-size: 46px; color: #111; mix-blend-mode: normal; }
 
   /* Altyazı */
   #altyazi { position: absolute; top: 1165px; left: 80px; width: 860px; height: 250px; gap: 0 34px;
@@ -128,8 +129,13 @@ function gorselHTML(g) {
       <div class="deger" data-v="${g.sayac.deger}">0</div><div class="birim">${esc(g.sayac.birim || '')}</div></div>`;
   if (g.karsilastirma) {
     const k = g.karsilastirma, max = Math.max(...k.map(x => x.deger));
-    return `<div class="kars">${k.map(x => `<div class="satir"><div class="etiket">${esc(x.etiket)}</div>
-      <div class="cubuk"><i data-w="${x.deger / max}"></i><b>${esc(x.yazi || x.deger)}</b></div></div>`).join('')}</div>`;
+    // "243 gün" gibi değerler çubukla birlikte sayarak artar; sayıyla başlamayan yazılar sabit kalır.
+    return `<div class="kars">${k.map(x => {
+      const yazi = String(x.yazi || x.deger), sayar = yazi.startsWith(String(x.deger));
+      const deger = sayar ? `<b class="deger" data-v="${x.deger}" data-ek="${esc(yazi.slice(String(x.deger).length))}">0</b>` : `<b>${esc(yazi)}</b>`;
+      return `<div class="satir"><div class="etiket"><span>${esc(x.etiket)}</span>${deger}</div>
+        <div class="cubuk"><i data-w="${x.deger / max}"></i></div></div>`;
+    }).join('')}</div>`;
   }
   return '';
 }
@@ -201,11 +207,20 @@ function sahneyiCiz(s, t) {
     if (v < 0 || u > sonraki + 0.22) { be.style.opacity = 0; return; }
     const gir = backOut(v / 0.5), cik = easeInOut((u - sonraki) / 0.22);
     be.style.opacity = clamp(v / 0.12) * (1 - cik);
-    const salinim = Math.sin(u * 2.1 + k) * 10;
-    be.style.transform = `translateY(${salinim - cik * 40}px) scale(${Math.max(0, gir) * (1 - cik * 0.3)}) rotate(${(1 - clamp(gir)) * -18 + Math.sin(u * 1.7) * 2.5}deg)`;
-    const deger = be.querySelector('.deger');
-    if (deger) deger.textContent = Math.round(+deger.dataset.v * easeOut((v - 0.15) / 1.1)).toLocaleString('tr-TR');
-    be.querySelectorAll('.cubuk i').forEach((bar, j) => { bar.style.width = (+bar.dataset.w * easeOut((v - 0.2 - j * 0.25) / 0.9) * 100) + '%'; });
+    // Emojiler canlı dursun diye hafifçe sallanır; grafik ve sayaçlar düz kalır.
+    const emoji = !!be.querySelector('.emoji');
+    const salinim = Math.sin(u * 2.1 + k) * (emoji ? 10 : 4);
+    const aci = emoji ? (1 - clamp(gir)) * -18 + Math.sin(u * 1.7) * 2.5 : 0;
+    be.style.transform = `translateY(${salinim - cik * 40}px) scale(${Math.max(0, gir) * (1 - cik * 0.3)}) rotate(${aci}deg)`;
+    const sayac = be.querySelector('.sayac .deger');
+    if (sayac) sayac.textContent = Math.round(+sayac.dataset.v * easeOut((v - 0.15) / 1.1)).toLocaleString('tr-TR');
+    be.querySelectorAll('.kars .satir').forEach((satir, j) => {
+      const p = easeOut((v - 0.2 - j * 0.25) / 0.9);
+      const bar = satir.querySelector('.cubuk i');
+      bar.style.width = (+bar.dataset.w * p * 100) + '%';
+      const d = satir.querySelector('.deger');
+      if (d) d.textContent = Math.round(+d.dataset.v * p).toLocaleString('tr-TR') + d.dataset.ek;
+    });
     const gz = be.querySelector('.gezegen i');
     if (gz) gz.style.transform = `translateX(${(u * 40) % 120}px)`;
   });
